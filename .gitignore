@@ -177,4 +177,5 @@ cython_debug/
 .gigaide/**
 *.csv
 logs.log.*
+*.json
 
