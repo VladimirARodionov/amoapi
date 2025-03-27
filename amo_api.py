@@ -6,11 +6,11 @@ import logging.config
 from typing import List, Dict, Any, Optional
 import time
 
-from config import AMO_DOMAIN, AMO_LOGIN, AMO_API_KEY
+from config import AMO_DOMAIN, AMO_API_KEY, CLIENT_ID, REDIRECT_URI
 from models import ContactResponse, ContactsResponse, ContactUpdate, ContactUpdateRequest
 
 # Настройка логирования
-logging.config.fileConfig(fname=Path(__file__).resolve().parent.parent / 'logging.ini',
+logging.config.fileConfig(fname=Path(__file__).resolve().parent / 'logging.ini',
                           disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
 
@@ -20,19 +20,23 @@ class AmoApiClient:
     
     def __init__(self):
         self.domain = AMO_DOMAIN
-        self.login = AMO_LOGIN
+        self.client_id = CLIENT_ID
         self.api_key = AMO_API_KEY
         self.base_url = f"https://{self.domain}"
+        self.redirect_uri = REDIRECT_URI
         self.session = requests.Session()
         self.auth_header = None
     
     def authenticate(self) -> bool:
         """Аутентификация в AMO CRM используя упрощенную авторизацию"""
         try:
-            auth_url = f"{self.base_url}/private/api/auth.php"
+            auth_url = f"{self.base_url}/oauth2/access_token"
             auth_data = {
-                "USER_LOGIN": self.login,
-                "USER_HASH": self.api_key
+                "client_id": self.client_id,
+                "redirect_uri": self.redirect_uri,
+                "grant_type": "authorization_code",
+                "code": self.api_key,
+                "client_secret": self.api_key,
             }
             
             response = self.session.post(auth_url, data=auth_data)
@@ -49,7 +53,7 @@ class AmoApiClient:
                 logger.error(f"Ошибка авторизации: {auth_result}")
                 return False
         except requests.exceptions.RequestException as e:
-            logger.error(f"Ошибка при авторизации: {e}")
+            logger.exception(f"Ошибка при авторизации: {e}")
             return False
     
     def get_contacts(self, limit: int = 50, page: int = 1) -> Optional[ContactsResponse]:
