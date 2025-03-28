@@ -217,8 +217,8 @@ class ContactsManager
                 'name' => $contact->getName(),
                 'first_name' => $contact->getFirstName(),
                 'last_name' => $contact->getLastName(), 
-                'created_at' => $contact->getCreatedAt(),
-                'updated_at' => $contact->getUpdatedAt(),
+                'created_at' => date('r', $contact->getCreatedAt()),
+                'updated_at' => date('r', $contact->getUpdatedAt()),
             ];
             echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . PHP_EOL;
             return true;
