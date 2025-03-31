@@ -150,7 +150,8 @@ class ContactsManager
             // Обновляем контакты
             if (!empty($contactsToUpdate)) {
                 $contactsCollection = new ContactsCollection();
-                $contactsErrors = new ContactsCollection();
+                $contactsErrors[] = [];
+                $errors_count = 0;
                 
                 foreach ($contactsToUpdate as $contactData) {
                     try {
@@ -171,7 +172,7 @@ class ContactsManager
                         
                         // Обновляем контакт
                         $contactsService->update($updateCollection);
-                        
+
                         // Добавляем в общую коллекцию для подсчета
                         $contactsCollection->add($contact);
                         
@@ -182,12 +183,16 @@ class ContactsManager
                         
                     } catch (AmoCRMApiException $e) {
                         echo 'Ошибка обновления контакта #' . $contactData['id'] . ': ' . $e->getMessage() . PHP_EOL;
-                        $contactsErrors->add($contactData);
+                        $errors_count++;
+                        $contactsErrors[] = [
+                        'id' => $contactData['id'],
+                        'name' => $contactData['name'],
+                        ];
                     }
                 }
                 
                 echo 'Всего успешно обновлено контактов: ' . $contactsCollection->count() . PHP_EOL;
-                echo 'Всего ошибок: ' . $contactsErrors->count() . PHP_EOL;
+                echo 'Всего ошибок: ' . $errors_count . PHP_EOL;
                 $err_file = fopen('errors.csv', 'w');
                 foreach ($contactsErrors as $contact_err) {
                     fputcsv($err_file, $contact_err, ';', '"', '\\');
