@@ -182,7 +182,7 @@ class ContactsManager
                         
                     } catch (AmoCRMApiException $e) {
                         echo 'Ошибка обновления контакта #' . $contactData['id'] . ': ' . $e->getMessage() . PHP_EOL;
-                        $contactsErrors->add($contact);
+                        $contactsErrors->add($contactData);
                     }
                 }
                 
