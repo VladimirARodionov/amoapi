@@ -136,9 +136,7 @@ class ContactsManager
                 
                 $contactId = (int)$data[0];
                 $name = $data[1] or '';
-                //echo $name . PHP_EOL;
-                //$name = preg_replace('/\s+/', ' ', $name);
-                
+
                 $contactsToUpdate[] = [
                     'id' => $contactId,
                     'name' => $name,
@@ -183,6 +181,7 @@ class ContactsManager
                         
                     } catch (AmoCRMApiException $e) {
                         echo 'Ошибка обновления контакта #' . $contactData['id'] . ': ' . $e->getMessage() . PHP_EOL;
+                        //echo 'Причина ошибки: ' . var_dump($e->getValidationErrors()) . PHP_EOL;
                         $errors_count++;
                         $contactsErrors[] = [
                         'id' => $contactData['id'],
@@ -224,8 +223,10 @@ class ContactsManager
                 'last_name' => $contact->getLastName(), 
                 'created_at' => date('r', $contact->getCreatedAt()),
                 'updated_at' => date('r', $contact->getUpdatedAt()),
+                'created_by' => $contact->getCreatedBy(),
             ];
             echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . PHP_EOL;
+            //echo var_dump($contact) . PHP_EOL;
             return true;
     }
 
